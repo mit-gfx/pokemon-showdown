@@ -57,7 +57,7 @@ interface EventListener extends EventListenerWithoutPriority {
 	speed?: number;
 }
 
-type Part = string | number | boolean | AnyObject | null | undefined;
+type Part = string | number | boolean | Pokemon | Side | Effect | Move | null | undefined;
 
 // The current request state of the Battle:
 //
@@ -1373,7 +1373,7 @@ export class Battle {
 		return true;
 	}
 
-	swapPosition(pokemon: Pokemon, slot: number, attributes?: string | AnyObject) {
+	swapPosition(pokemon: Pokemon, slot: number, attributes?: string) {
 		if (slot >= pokemon.side.active.length) {
 			throw new Error("Invalid swap position");
 		}
@@ -1622,6 +1622,10 @@ export class Battle {
 			throw new Error('Battle not started: A player has an empty team.');
 		}
 
+		if (this.debugMode) {
+			this.checkEVBalance();
+		}
+
 		this.residualEvent('TeamPreview');
 
 		this.queue.addChoice({choice: 'start'});
@@ -1636,6 +1640,20 @@ export class Battle {
 
 		// @ts-ignore - readonly
 		this.send = send;
+	}
+
+	checkEVBalance() {
+		let limitedEVs: boolean | null = null;
+		for (const side of this.sides) {
+			const sideLimitedEVs = !side.pokemon.some(
+				pokemon => Object.values(pokemon.set.evs).reduce((a, b) => a + b, 0) > 510
+			);
+			if (limitedEVs === null) {
+				limitedEVs = sideLimitedEVs;
+			} else if (limitedEVs !== sideLimitedEVs) {
+				this.add('bigerror', "Warning: One player isn't adhering to a 510 EV limit, and the other player is.");
+			}
+		}
 	}
 
 	boost(
@@ -1982,7 +2000,7 @@ export class Battle {
 				type: '???',
 				category: 'Physical',
 				willCrit: false,
-			}) as ActiveMove;
+			}) as unknown as ActiveMove;
 			move.hit = 0;
 		}
 
