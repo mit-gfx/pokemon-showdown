@@ -40,6 +40,15 @@ export class RandomPlayerAI extends BattlePlayer {
 		} else if (request.forceSwitch) {
 			// switch request
 			const pokemon = request.side.pokemon;
+			/*TODO: Evan: As you can see, here we have a list of Pokemon
+				        Each Pokemon has a bunch of fields
+				        What data can we get about each Pokemon?
+				*/
+			
+			/*TODO: Evan: What else can we get about the state of the world?  
+			It would be nice to know what other effects are happening, sunlight, rain, etc.
+			I suspect this might be gettable from request.??
+				*/
 			const chosen: number[] = [];
 			const choices = request.forceSwitch.map((mustSwitch: AnyObject) => {
 				if (!mustSwitch) return `pass`;
@@ -135,6 +144,10 @@ export class RandomPlayerAI extends BattlePlayer {
 					if (m.zMove) move += ` zmove`;
 					return {choice: move, move: m};
 				});
+				/*TODO: Evan: As you can see, here we have a list of moves we can make 
+				        (I believe these are attacks, non-switches)
+				        What information can we get about each move?
+				*/
 
 				const canSwitch = range(1, 6).filter(j => (
 					pokemon[j - 1] &&
@@ -145,6 +158,8 @@ export class RandomPlayerAI extends BattlePlayer {
 					// not fainted
 					!pokemon[j - 1].condition.endsWith(` fnt`)
 				));
+				
+				
 				const switches = active.trapped ? [] : canSwitch;
 
 				if (switches.length && (!moves.length || this.prng.next() > this.move)) {

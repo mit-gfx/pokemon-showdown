@@ -18,6 +18,10 @@ export interface MultiRandomRunnerOptions extends RunnerOptions {
 	async?: boolean;
 }
 
+/*TODO: Evan: We should make our own version of this that's just gen2randombattle, or, 
+        our own custom format that will be 1v1
+				*/
+
 export class MultiRandomRunner {
 	static readonly FORMATS = [
 		'gen8randombattle', 'gen8randomdoublesbattle', 'gen8battlefactory',
